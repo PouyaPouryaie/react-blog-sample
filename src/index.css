@@ -19,6 +19,10 @@ body {
   background-color: #efefef;
 }
 
+/* 
+  to have consistence between different component, add css for root, because all the component are added in the root.
+  flex-grow: ???
+*/
 #root {
   flex-grow: 1;
   display: flex;
