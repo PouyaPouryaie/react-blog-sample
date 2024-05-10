@@ -11,6 +11,8 @@ import { Route, Switch, useHistory } from 'react-router-dom';
 import { useState, useEffect} from 'react';
 import { format } from 'date-fns';
 import api from './api/posts'
+import useWindowSize from './hooks/useWindowSize';
+import useAxiosFetch from './hooks/useAxiosFetch';
 
 function App() {
   const [posts, setPosts] = useState ([])
@@ -28,6 +30,14 @@ function App() {
   */
   const history = useHistory();
 
+  const { width } = useWindowSize();
+  const { data, fetchError, isLoading } = useAxiosFetch('http://localhost:3500/posts');
+
+  useEffect( () => {
+    setPosts(data);
+  }, [data])
+
+  /* comment because of useAxiosFetch
   useEffect( () => {
     const fectPosts = async () => {
       try {
@@ -49,6 +59,8 @@ function App() {
 
     fectPosts();
   }, [])
+
+  */
 
   useEffect( () => {
     const filteredResults = posts.filter(post => (
@@ -107,13 +119,17 @@ function App() {
 
   return (
     <div className="App">
-      <Header title="React JS Blog" />
+      <Header title="React JS Blog" width={width} />
       <Nav search={search} setSearch={setSearch}/>
       <Switch>
         {/* if we don't use exact for '/', all the other routes is similar with home endpoint and react dosen't route to other page
             note: when your route is share between different endpoint, you need to use `exact` keyword */}
         <Route exact path="/">
-          <Home posts={searchResult} />
+          <Home
+            posts={searchResult}
+            fetchError={fetchError}
+            isLoading={isLoading}
+            />
         </Route>
         <Route exact path="/post">
           <NewPost
