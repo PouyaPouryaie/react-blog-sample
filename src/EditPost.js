@@ -1,12 +1,24 @@
 import React from 'react'
-import { useEffect } from 'react'
-import { useParams, Link } from 'react-router-dom'
+import { useEffect, useContext, useState } from 'react'
+import { useParams, Link, useHistory } from 'react-router-dom'
+import { format } from 'date-fns';
+import api from './api/posts';
+import DataContext from './context/DataContext';
 
-const EditPost = ({
-  posts, handleEdit, editBody, setEditBody, editTitle, setEditTitle
-}) => {
+const EditPost = () => {
+
+  const {  posts, setPosts } = useContext(DataContext);
 
   const {id} = useParams();
+  const [editTitle, setEditTitle] = useState('');
+  const [editBody, setEditBody] = useState('');
+
+  /*
+    to serve component instead of requesting anyting from server,
+    we are serving the component that is routed to home directory by using browser history
+    the reason, we use to '/posts' as endpoint is we create json-server and the name of the object is defined posts 
+  */
+  const history = useHistory();
 
   // because useParams method is going to fectch as a String, to compare we need to cast post.id to string
   const post = posts.find(post => (post.id).toString() === id);
@@ -17,6 +29,20 @@ const EditPost = ({
       setEditBody(post.body);
     }
   }, [post, setEditTitle, setEditBody]);
+
+  const handleEdit = async (id) => {
+    const datetime = format(new Date(), 'MMMM dd, yyyy pp');
+    const updatedPost = { id, title: editTitle, datetime, body: editBody };
+    try {
+      const response = await api.put(`/posts/${id}`, updatedPost);
+      setPosts(posts.map( post => post.id === id ? { ...response.data } : post));
+      setEditTitle('');
+      setEditBody('');
+      history.push('/');
+    } catch(err) {
+      console.log(`Error: ${err.message}`);
+    }
+}
 
   return (
     <main className='NewPost'>

@@ -1,12 +1,17 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { useContext } from 'react';
+import DataContext from './context/DataContext';
 
 /* 
   Link works like a ancher in HTML, however this tells react router dosen't 
   request this link from server call the server, just route proper component
 */
 
-const Nav = ( {search, setSearch} ) => {
+const Nav = ( ) => {
+
+  const {search, setSearch } = useContext(DataContext);
+
   return (
     <nav className='Nav'>
         <form className='searchForm' onSubmit={ (e) => e.preventDefault()}>
